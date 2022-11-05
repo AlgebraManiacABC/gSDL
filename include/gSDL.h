@@ -30,7 +30,7 @@ int gSDL_Init(Uint32 init_flags, SDL_Window ** w, int win_w, int win_h,
 
 //WINBOOL gSDL_Create_Menu(HWND hwnd, char * str);
 
-int gSDL_MaximizeWindow(SDL_Window ** w, SDL_Renderer ** r);
+int gSDL_MaximizeWindow(SDL_Window ** w, SDL_Renderer ** r, const char * windowName);
 
 Button CreateSolidButton(SDL_Renderer *r, SDL_Color color, int x_center, int y_center, int w, int h);
 

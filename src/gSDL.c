@@ -54,32 +54,39 @@ WINBOOL gSDL_Create_Menu(HWND hwnd, char * str)
 }
 */
 
-int gSDL_MaximizeWindow(SDL_Window ** w, SDL_Renderer ** r)
+int gSDL_MaximizeWindow(SDL_Window ** w, SDL_Renderer ** r, const char * windowName)
 {
-    SDL_DisplayMode disp;
-    if(SDL_GetDesktopDisplayMode(0,&disp))
+    int ww,wh;
+    SDL_GetWindowSize(*w, &ww, &wh);
+    Uint32 winFlags = SDL_GetWindowFlags(*w);
+    SDL_RendererInfo info;
+    if(SDL_GetRendererInfo(*r,&info))
     {
-        fprintf(stderr,"Couldn't get display mode! %s\n",SDL_GetError());
+        fprintf(stderr,"Couldn't get renderer info! [%s]\n",SDL_GetError());
         return EXIT_FAILURE;
     }
+
     SDL_DestroyWindow(*w);
-    *w = SDL_CreateWindow("Betrayal at House on the Hill",
-                SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,
-                disp.w,disp.h,
-                SDL_WINDOW_MAXIMIZED | SDL_WINDOW_BORDERLESS);
-    if(!(*w))
-    {
-        fprintf(stderr,"Window could not be resized! %s\n",SDL_GetError());
-        return EXIT_FAILURE;
-    }
     SDL_DestroyRenderer(*r);
-    *r = SDL_CreateRenderer(*w,-1,
-                SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-    if(!(*r))
+
+    SDL_Window * newWin = SDL_CreateWindow(windowName,
+                SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,
+                ww,wh,winFlags);
+    if(!(newWin))
     {
-        fprintf(stderr,"Window could not be resized! %s\n",SDL_GetError());
+        fprintf(stderr,"Window could not be resized! [%s]\n",SDL_GetError());
         return EXIT_FAILURE;
     }
+
+    SDL_Renderer * newRend = SDL_CreateRenderer(newWin,-1,info.flags);
+    if(!(newRend))
+    {
+        fprintf(stderr,"Window could not be resized! [%s]\n",SDL_GetError());
+        return EXIT_FAILURE;
+    }
+
+    *w = newWin;
+    *r = newRend;
     return EXIT_SUCCESS;
 }
 
@@ -195,9 +202,9 @@ int gSDL_Close(int level, ...)
     switch(level)
     {
         case LEVEL_REND:
-            SDL_DestroyRenderer(va_arg(vars,SDL_Renderer*));
+            SDL_DestroyRenderer(*(va_arg(vars,SDL_Renderer**)));
         case LEVEL_WIN:
-            SDL_DestroyWindow(va_arg(vars,SDL_Window*));
+            SDL_DestroyWindow(*(va_arg(vars,SDL_Window**)));
         case LEVEL_INIT:
             SDL_Quit();
             break;
