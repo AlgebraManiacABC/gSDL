@@ -1,6 +1,6 @@
 #include "gSDL.h"
 
-int mySDL_Init(Uint32 init_flags, SDL_Window ** w, int win_w, int win_h,
+int gSDL_Init(Uint32 init_flags, SDL_Window ** w, int win_w, int win_h,
     Uint32 win_flags, char * win_name, SDL_Renderer ** r)
 {
     if(SDL_Init(init_flags))
@@ -25,7 +25,7 @@ int mySDL_Init(Uint32 init_flags, SDL_Window ** w, int win_w, int win_h,
     if(!(*r))
     {
         fprintf(stderr,"Renderer creation failure: %s\n",SDL_GetError());
-        mySDL_Close(LEVEL_WIN,*w);
+        gSDL_Close(LEVEL_WIN,*w);
         return EXIT_FAILURE;
     }
 
@@ -33,7 +33,7 @@ int mySDL_Init(Uint32 init_flags, SDL_Window ** w, int win_w, int win_h,
 }
 
 /*
-HWND mySDL_Get_WinHandle(SDL_Window * w)
+HWND gSDL_Get_WinHandle(SDL_Window * w)
 {
     SDL_SysWMinfo winfo;
     SDL_VERSION(&winfo.version);
@@ -44,7 +44,7 @@ HWND mySDL_Get_WinHandle(SDL_Window * w)
     return winfo.info.win.window;
 }
 
-WINBOOL mySDL_Create_Menu(HWND hwnd, char * str)
+WINBOOL gSDL_Create_Menu(HWND hwnd, char * str)
 {
     HMENU menu = CreateMenu();
 
@@ -54,7 +54,7 @@ WINBOOL mySDL_Create_Menu(HWND hwnd, char * str)
 }
 */
 
-int mySDL_MaximizeWindow(SDL_Window ** w, SDL_Renderer ** r)
+int gSDL_MaximizeWindow(SDL_Window ** w, SDL_Renderer ** r)
 {
     SDL_DisplayMode disp;
     if(SDL_GetDesktopDisplayMode(0,&disp))
@@ -109,7 +109,7 @@ int Button_AddText(SDL_Renderer *r, Button but, TTF_Font *font, char *text, SDL_
     if(!temp) return EXIT_FAILURE;
 
     if(SDL_SetRenderTarget(r,but.tx))       return EXIT_FAILURE;
-    SDL_Rect box = myTTF_CreateRectFromTexture(temp,0,0,pt);
+    SDL_Rect box = gTTF_CreateRectFromTexture(temp,0,0,pt);
     box.x = (but.rect.w / 2) - (box.w/2);
     box.y = (but.rect.h / 2) - (box.h/2);
     if(SDL_RenderCopy(r,temp,NULL,&box))    return EXIT_FAILURE;
@@ -136,16 +136,16 @@ bool isMouseOverButton(int mx, int my, Button but)
     return true;
 }
 
-myIMG CreateImgFromFile(SDL_Renderer *r, const char *file)
+gIMG CreateImgFromFile(SDL_Renderer *r, const char *file)
 {
     SDL_Surface *temp = IMG_Load(file);
-    myIMG img = {NULL,{0,0,0,0}};
+    gIMG img = {NULL,{0,0,0,0}};
     img.tx = SDL_CreateTextureFromSurface(r,temp);
     SDL_QueryTexture(img.tx,NULL,NULL,&img.rect.w,&img.rect.h);
     return img;
 }
 
-int myIMG_Resize(myIMG *img, int w, int h)
+int gIMG_Resize(gIMG *img, int w, int h)
 {
     if(!img) return EXIT_FAILURE;
     img->rect.h = h;
@@ -153,12 +153,12 @@ int myIMG_Resize(myIMG *img, int w, int h)
     return EXIT_SUCCESS;
 }
 
-int myIMG_RenderCopy(SDL_Renderer *r, myIMG *img)
+int gIMG_RenderCopy(SDL_Renderer *r, gIMG *img)
 {
     return SDL_RenderCopy(r,img->tx,NULL,&img->rect);
 }
 
-SDL_Rect myTTF_CreateRectFromTexture(SDL_Texture *text, int x, int y, int pt)
+SDL_Rect gTTF_CreateRectFromTexture(SDL_Texture *text, int x, int y, int pt)
 {
     SDL_Rect box = {x,y,0,0};
     SDL_QueryTexture(text,NULL,NULL,&box.w,&box.h);
@@ -168,7 +168,7 @@ SDL_Rect myTTF_CreateRectFromTexture(SDL_Texture *text, int x, int y, int pt)
     return box;
 }
 
-int myTTF_RenderText(SDL_Renderer * r, SDL_Texture * text, int x, int y, int pt)
+int gTTF_RenderText(SDL_Renderer * r, SDL_Texture * text, int x, int y, int pt)
 {
     SDL_Rect box = {x,y,0,0};
     SDL_QueryTexture(text,NULL,NULL,&box.w,&box.h);
@@ -188,7 +188,7 @@ SDL_Texture * CreateSolidTextureFromText
     return tex;
 }
 
-int mySDL_Close(int level, ...)
+int gSDL_Close(int level, ...)
 {
     va_list vars;
     va_start(vars,level);
@@ -202,7 +202,7 @@ int mySDL_Close(int level, ...)
             SDL_Quit();
             break;
         default:
-            fprintf(stderr,"Unknown mySDL_Close level!\n");
+            fprintf(stderr,"Unknown gSDL_Close level!\n");
             va_end(vars);
             return EXIT_FAILURE;
             break;
