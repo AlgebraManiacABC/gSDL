@@ -11,6 +11,8 @@
 
 #define PT_DEFAULT 200
 
+#ifndef GIMG
+#define GIMG
 typedef struct
 {
     SDL_Texture *tx;
@@ -19,6 +21,7 @@ typedef struct
 }   gIMG;
 
 typedef gIMG Button;
+#endif
 
 int gSDL_Init(Uint32 init_flags, SDL_Window ** w, int win_w, int win_h,
     Uint32 win_flags, char * win_name, SDL_Renderer ** r);
