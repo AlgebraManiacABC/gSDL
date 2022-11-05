@@ -56,13 +56,17 @@ WINBOOL gSDL_Create_Menu(HWND hwnd, char * str)
 
 int gSDL_MaximizeWindow(SDL_Window ** w, SDL_Renderer ** r, const char * windowName)
 {
-    int ww,wh;
-    SDL_GetWindowSize(*w, &ww, &wh);
     Uint32 winFlags = SDL_GetWindowFlags(*w);
     SDL_RendererInfo info;
     if(SDL_GetRendererInfo(*r,&info))
     {
         fprintf(stderr,"Couldn't get renderer info! [%s]\n",SDL_GetError());
+        return EXIT_FAILURE;
+    }
+    SDL_DisplayMode disp;
+    if(SDL_GetDesktopDisplayMode(0,&disp))
+    {
+        fprintf(stderr,"Couldn't get display mode! [%s]\n",SDL_GetError());
         return EXIT_FAILURE;
     }
 
@@ -71,7 +75,7 @@ int gSDL_MaximizeWindow(SDL_Window ** w, SDL_Renderer ** r, const char * windowN
 
     SDL_Window * newWin = SDL_CreateWindow(windowName,
                 SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,
-                ww,wh,winFlags);
+                disp.w,disp.h,winFlags | SDL_WINDOW_MAXIMIZED);
     if(!(newWin))
     {
         fprintf(stderr,"Window could not be resized! [%s]\n",SDL_GetError());
