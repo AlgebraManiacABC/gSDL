@@ -1,2 +1,6 @@
 build*
 lib*
+*.vs*
+*.txt
+*.exe
+*.out
