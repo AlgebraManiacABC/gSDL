@@ -1,7 +1,7 @@
 #include "gSDL.h"
 
 int gSDL_Init(Uint32 init_flags, SDL_Window ** w, int win_w, int win_h,
-    Uint32 win_flags, char * win_name, SDL_Renderer ** r)
+    Uint32 win_flags, char * win_name, SDL_Renderer ** r, Uint32 rend_flags, Uint32 img_flags)
 {
     if(SDL_Init(init_flags))
     {
@@ -20,8 +20,7 @@ int gSDL_Init(Uint32 init_flags, SDL_Window ** w, int win_w, int win_h,
         return EXIT_FAILURE;
     }
 
-    *r = SDL_CreateRenderer(*w,-1,
-                SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+    *r = SDL_CreateRenderer(*w,-1,rend_flags);
     if(!(*r))
     {
         fprintf(stderr,"Renderer creation failure: %s\n",SDL_GetError());
@@ -29,30 +28,35 @@ int gSDL_Init(Uint32 init_flags, SDL_Window ** w, int win_w, int win_h,
         return EXIT_FAILURE;
     }
 
+    if(IMG_Init(img_flags) != img_flags)
+    {
+        fprintf(stderr,"SDL_image initialization failure: %s\n",IMG_GetError());
+        gSDL_Close(LEVEL_REND,*r,*w);
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
 
-/*
-HWND gSDL_Get_WinHandle(SDL_Window * w)
-{
-    SDL_SysWMinfo winfo;
-    SDL_VERSION(&winfo.version);
-    if(!SDL_GetWindowWMInfo(w,&winfo))
-    {
-        return NULL;
-    }
-    return winfo.info.win.window;
-}
+//HWND gSDL_Get_WinHandle(SDL_Window * w)
+//{
+//    SDL_SysWMinfo winfo;
+//    SDL_VERSION(&winfo.version);
+//    if(!SDL_GetWindowWMInfo(w,&winfo))
+//    {
+//        return NULL;
+//    }
+//    return winfo.info.win.window;
+//}
 
-WINBOOL gSDL_Create_Menu(HWND hwnd, char * str)
-{
-    HMENU menu = CreateMenu();
+//WINBOOL gSDL_Create_Menu(HWND hwnd, char * str)
+//{
+//    HMENU menu = CreateMenu();
 
-    AppendMenu(menu,MF_STRING,(UINT_PTR)NULL,str);
+//    AppendMenu(menu,MF_STRING,(UINT_PTR)NULL,str);
 
-    return SetMenu(hwnd,menu);
-}
-*/
+//    return SetMenu(hwnd,menu);
+//}
 
 int gSDL_MaximizeWindow(SDL_Window ** w, SDL_Renderer ** r, const char * windowName)
 {
@@ -161,6 +165,14 @@ int gIMG_Resize(gIMG *img, int w, int h)
     if(!img) return EXIT_FAILURE;
     img->rect.h = h;
     img->rect.w = w;
+    return EXIT_SUCCESS;
+}
+
+int gIMG_Move(gIMG *img, int x, int y)
+{
+    if(!img) return EXIT_FAILURE;
+    img->rect.x = x - (img->rect.w / 2);
+    img->rect.y = y - (img->rect.h / 2);
     return EXIT_SUCCESS;
 }
 

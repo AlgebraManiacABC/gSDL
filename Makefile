@@ -33,12 +33,12 @@ $(LIB_DIR):
 	mkdir $(LIB_DIR)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INCS) | $(OBJ_DIR)
-	gcc -c -o $@ $< -I"$(INC_DIR)" -I"$(I_SDL)"
+	gcc -c -o $@ $< -I"$(INC_DIR)" $(CFLAGS)
 
 $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
 
-.PHONY: install clean test
+.PHONY: install clean test run
 
 install: $(INCS) $(LIB)
 ifeq ($(OS),Windows_NT)
@@ -49,8 +49,11 @@ else
 	sudo cp $(LIB) /usr/local/lib/lib$(NAME).a
 endif
 
-test: $(TEST_DIR)/init.c
-	gcc -o $(TEST_DIR)/$@.$(EXT) $^ -Wall -Werror -I"$(INC_DIR)" $(CFLAGS)
+test: $(TEST_DIR)/init.c install
+	gcc -o $(TEST_DIR)/$@.$(EXT) $< -Wall -Werror -I"$(INC_DIR)" $(CFLAGS)
+
+run: test
+	./$(TEST_DIR)/$^.$(EXT)
 
 clean:
 	$(RM) $(OBJ_DIR)
